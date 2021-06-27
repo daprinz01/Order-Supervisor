@@ -43,7 +43,19 @@ namespace Supervisor.Controllers
                     await Task.Delay(100);
                     var confirmationTable = await _tableBroker.CreateTableIfNotExistsAsync(_confirmationsTableName);
                     var confirmation = await _tableBroker.RetrieveEntityUsingPointQueryAsync<Confirmation>(confirmationTable, $"1", $"{order.OrderId}");
-                    return Ok(confirmation);
+                    if (confirmation != null)
+                    {
+                        return Ok(confirmation);
+
+                    }
+                    else
+                    {
+                        return NotFound(new ErrorResponse
+                        {
+                            ResponseCode = "02",
+                            ResponseMessage = "Order was not processed in time by agents"
+                        });
+                    }
                 }
                 catch (Exception exception)
                 {
